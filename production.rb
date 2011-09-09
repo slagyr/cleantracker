@@ -1,27 +1,17 @@
-# This file (production.rb) is the first file loaded opening a production.  It must define a module named 'Production'.
-# The containing production will acquire all the behavior defined in this module.
-# You may define serveral hooks and initialization steps here.
-
 module Production
 
-#  # Define this method if you want the production name to be different from the default, directory name.
-#  def name
-#    return Cleantracker
-#  end
-#
-#  # Returns the minimum version of limelight required to run this production.  Default: "0.0.0"
-#  # If the version of limelight used to open this production is less than the minimum, 
-#  # an error will be displayed (starting with version 0.4.0).
-#  #
-#  def minimum_limelight_version
-#    return "0.5.5"
-#  end
-#
-#  # Hook #1.  Called when the production is newly created, before any loading has been done.
-#  # This is a good place to require needed files and instantiate objects in the business layer.
-#  def production_opening
-#  end
-#
+  attr_accessor :cleandata
+  attr_reader :cache
+
+  # Hook #1.  Called when the production is newly created, before any loading has been done.
+  # This is a good place to require needed files and instantiate objects in the business layer.
+  def production_opening
+    @cache = {}
+    $:.unshift File.expand_path(File.dirname(__FILE__) + "/lib")
+    require File.expand_path(File.dirname(__FILE__) + "/gems/bundler/setup")
+    require 'cleandata/client'
+  end
+
 #  # Hook #2.  Called after internal gems have been loaded and stages have been instantiated, yet before
 #  # any scenes have been opened.
 #  def production_loaded

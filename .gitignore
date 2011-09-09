@@ -1,1 +1,5 @@
 .idea
+gems
+/lib/*.jar
+.bundle
+
