@@ -66,7 +66,7 @@ describe Cleantracker::Director do
 
   it "loads viewer history chart" do
     cache.should_receive(:[]).with(:viewers).and_return(:cached_viewers)
-    data.should_receive(:history_report).with(:cached_viewers).and_return(:data => [:fooey])
+    data.should_receive(:history_report_for).with(:cached_viewers).and_return(:data => [:fooey])
     charts.should_receive(:line_url).with(:data => [:fooey], :width => 600, :height => 500).and_return("http://some.url")
     curl.should_receive(:get).with("http://some.url").and_return("/path/to/new_image")
     view.should_receive(:display_chart).with("Viewer History", "/path/to/new_image")

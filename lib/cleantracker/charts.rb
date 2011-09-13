@@ -44,7 +44,7 @@ module Cleantracker
     end
 
     def grid_steps(options={})
-      "chg=10,20"
+      "chg=10,20,0,0"
     end
 
     def line_styles(options={})

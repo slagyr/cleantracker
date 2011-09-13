@@ -43,7 +43,7 @@ describe Cleantracker::Charts do
   end
 
   it "builds grid step param" do
-    subject.grid_steps.should == "chg=10,20"
+    subject.grid_steps.should == "chg=10,20,0,0"
   end
 
   it "builds line styles param" do

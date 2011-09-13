@@ -5,6 +5,7 @@ module Loading
 
   def scene_opened(e=nil)
     production.director.view = self
+    production.director.load_clean_data
   end
 
   def all_models_loaded

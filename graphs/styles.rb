@@ -21,6 +21,7 @@ chart_link {
 
 chart_frame {
   width :greedy
+  min_height 400
   horizontal_alignment :center
   vertical_alignment :center
 }

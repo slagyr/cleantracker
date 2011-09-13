@@ -9,6 +9,11 @@ describe "Loading" do
     scene
   end
 
+  it "initiates loading when opened" do
+    production.director.should_receive(:load_clean_data)
+    scene
+  end
+
   it "updates log when new model load is started" do
     scene.starting_load("foo")
     scene.loading_output.text.should == "Loading foo "

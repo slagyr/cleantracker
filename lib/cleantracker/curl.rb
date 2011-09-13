@@ -17,7 +17,7 @@ module Cleantracker
 
     def get(url)
       path = File.join(ROOT, new_name)
-      output = `curl -o #{path} #{url} 2>&1`
+      output = `curl -o #{path} "#{url}" 2>&1`
       raise output unless $?.success?
       path
     end
