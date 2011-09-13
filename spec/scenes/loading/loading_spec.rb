@@ -7,7 +7,7 @@ describe "Loading" do
   before do
     @client = mock("Cleandata::Client").as_null_object
     production.production_opening
-    production.cleandata = @client
+    production.clean_client = @client
   end
 
   it "loads stuff when the scene is opened" do

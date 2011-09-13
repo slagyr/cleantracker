@@ -22,7 +22,7 @@ module Loading
     begin
       log "Loading #{model} "
       @dots = animate(:updates_per_second => 4) { log ". " }
-      production.cache[model.to_sym] = production.cleandata.send(model.to_sym)
+      production.cache[model.to_sym] = production.clean_client.send(model.to_sym)
       log "DONE\n"
     ensure
       @dots.stop if @dots

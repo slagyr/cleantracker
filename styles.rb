@@ -1,6 +1,6 @@
 scene {
   background_color "#3A3A3A"
-  secondary_background_color "#1D1D1D"
+  secondary_background_color "#1e1e1e"
   gradient :on
   gradient_angle 270
   gradient_penetration "20%"

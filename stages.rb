@@ -11,7 +11,8 @@
 
 stage "default" do
   #default_scene "loading"
-  default_scene "login"
+  #default_scene "login"
+  default_scene "graphs"
   title "CleanTracker"
   location [:center, :center]
   size [800, 600]

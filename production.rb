@@ -1,7 +1,8 @@
 module Production
 
-  attr_accessor :cleandata
+  attr_accessor :clean_client
   attr_reader :cache
+  attr_reader :director
 
   # Hook #1.  Called when the production is newly created, before any loading has been done.
   # This is a good place to require needed files and instantiate objects in the business layer.
@@ -10,12 +11,14 @@ module Production
     $:.unshift File.expand_path(File.dirname(__FILE__) + "/lib")
     require File.expand_path(File.dirname(__FILE__) + "/gems/bundler/setup")
     require 'cleandata/client'
+    require 'cleantracker/director'
   end
 
-#  # Hook #2.  Called after internal gems have been loaded and stages have been instantiated, yet before
-#  # any scenes have been opened.
-#  def production_loaded
-#  end
+  # Hook #2.  Called after internal gems have been loaded and stages have been instantiated, yet before
+  # any scenes have been opened.
+  def production_loaded
+    @model = Cleantracker::Director.new
+  end
 #
 #  # Hook #3.  Called when the production, and all the scenes, have fully opened.
 #  def production_opened

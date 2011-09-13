@@ -16,8 +16,19 @@ task :jars do
   end
 end
 
-desc "Initialize the dev environment"
-task :init => [:jars] do
-  system "bundle install"
-  system "bundle install --standalone --path=gems --without=development"
+namespace :bundle do
+
+  desc "Basic bundle install"
+  task :install do
+    system "bundle install"
+  end
+
+  desc "Installed a local bundle for production"
+  task :standalone do
+    system "bundle install --standalone --path=gems --without=development"
+  end
+
 end
+
+desc "Initialize the dev environment"
+task :init => %w{jars bundle:install bundle:standalone}

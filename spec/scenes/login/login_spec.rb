@@ -28,7 +28,7 @@ describe "Login" do
 
     scene.find(:login_button).mouse_clicked(nil)
 
-    production.cleandata.should == @client
+    production.clean_client.should == @client
     scene.find(:error_message).text.should == "Failed to login: Nope!"
   end
 
