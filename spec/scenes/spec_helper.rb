@@ -84,6 +84,7 @@ module Limelight
 #          Java::limelight.Boot.boot
           else
             Limelight::Main.initializeTestContext
+            Limelight::Context.instance.animationLoop.stop
           end
           raise "$PRODUCTION_PATH undefined.  Make sure you specify the location of the production in $PRODUCTION_PATH." unless defined?($PRODUCTION_PATH)
           raise "Could not find production: '#{$PRODUCTION_PATH}'. Check $PRODUCTION_PATH." unless File.exists?($PRODUCTION_PATH)
@@ -197,6 +198,10 @@ module RSpec
 
         before(:each) do
           @player = @scene = nil
+        end
+
+        before do
+          production.director = mock("director").as_null_object
         end
       end
 

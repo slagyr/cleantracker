@@ -2,7 +2,7 @@ module Production
 
   attr_accessor :clean_client
   attr_reader :cache
-  attr_reader :director
+  attr_accessor :director
 
   # Hook #1.  Called when the production is newly created, before any loading has been done.
   # This is a good place to require needed files and instantiate objects in the business layer.
