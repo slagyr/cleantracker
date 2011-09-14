@@ -32,3 +32,6 @@ end
 
 desc "Initialize the dev environment"
 task :init => %w{jars bundle:install bundle:standalone}
+
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec)

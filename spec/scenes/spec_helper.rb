@@ -168,28 +168,13 @@ module Limelight
   end
 end
 
-RSpec.configure do |config|
-  config.after(:suite) do
-    #Java::limelight.Context.instance.killThreads
-    if Limelight::Specs.producer
-      Limelight::Specs.producer.theater.stages.each do |stage|
-        # MDM - We do this in a round-about way to reduce the chance of using stubbed or mocked methods.
-        frame = stage.instance_variable_get("@frame")
-        frame.close if frame
-      end
-    end
-    Java::java.awt.Window.getWindows.each do |window|
-      window.dispose
-    end
-  end
-end
-
 module RSpec
   module Core
     class ExampleGroup
 
       def self.uses_limelight(options = {}, &prop_block)
         include Limelight::Specs::SpecHelper
+        Java::Limelight.Context.instance.environment = "test"
 
         before(:all) do
           _init_ll_options(options)

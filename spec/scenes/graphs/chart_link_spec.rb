@@ -10,7 +10,7 @@ describe "Chart Links" do
 
   it "has plenty of chart links" do
     links = scene.find_by_name("chart_link")
-    links.size.should > 5
+    links.size.should > 3
   end
 
   it "triggers a load on click" do
