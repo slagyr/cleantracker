@@ -3,15 +3,17 @@ module Graphs
   DEFAULT_OPTIONS = {:width => 600, :height => 375}
 
   def scene_opened(e=nil)
-    production.director.view = self
-    load_chart(:viewer_history)
+    production.director.graph_scene_ready(self, DEFAULT_OPTIONS)
   end
 
-  def load_chart(id)
+  def chart_loading
     find(:chart_frame).remove_all
     find(:chart_frame).build do
       para :text => "Your graph is loading..."
     end
+  end
+
+  def load_chart(id)
     load_method = "load_#{id}_chart".to_sym
     production.director.send(load_method, DEFAULT_OPTIONS)
   end

@@ -10,9 +10,15 @@ describe "Graphs" do
   end
 
   it "loads viewer history by default" do
-    production.director.should_receive(:load_viewer_history_chart)
-    production.director.should_receive(:view=)
+    production.director.should_receive(:graph_scene_ready)
     scene
+  end
+
+  it "shows chart loading" do
+    scene.chart_loading
+
+    frame = scene.find(:chart_frame)
+    frame.children.first.text.should == "Your graph is loading..."
   end
 
   it "displays a chart" do

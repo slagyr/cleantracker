@@ -1,7 +1,23 @@
 require "date"
+require 'fileutils'
 
 module Cleantracker
   class Data
+
+    DATA_FILE = "/tmp/cleantracker/data"
+
+    def save(data)
+      FileUtils.mkdir_p(File.dirname(DATA_FILE))
+      File.open(DATA_FILE, "w") { |f| Marshal.dump(data, f) }
+    end
+
+    def load
+      File.open(DATA_FILE, "r") { |f| Marshal.load(f) }
+    end
+
+    def cache?
+      File.exists?(DATA_FILE)
+    end
 
     def group_by(data, &hat)
       groups = {}

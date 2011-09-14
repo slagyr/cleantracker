@@ -6,7 +6,7 @@ describe "Login" do
   uses_limelight :scene => "login", :hidden => true
 
   it "sets itself as the view on director" do
-    production.director.should_receive(:view=)
+    production.director.should_receive(:login_scene_ready)
     scene
   end
 

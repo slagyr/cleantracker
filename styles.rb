@@ -49,6 +49,7 @@ clean_button {
   left_padding 20
   right_padding 20
   rounded_corner_radius 3
+  horizontal_alignment :center
   hover {
     secondary_background_color "#53C6E3"
   }

@@ -1,7 +1,7 @@
 module Login
 
   def scene_opened(e=nil)
-    production.director.view = self
+    production.director.login_scene_ready(self)
   end
 
   def login_failed(message)

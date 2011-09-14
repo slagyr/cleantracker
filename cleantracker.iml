@@ -6,6 +6,7 @@
     <orderEntry type="jdk" jdkName="JRuby SDK 1.6.2-p330" jdkType="JRUBY_SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v2.6.0, JRuby SDK 1.6.2-p330) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rake (v0.9.2, JRuby SDK 1.6.2-p330) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bundler (v1.1.pre.9, JRuby SDK 1.6.2-p330) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-core (v2.6.4, JRuby SDK 1.6.2-p330) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-expectations (v2.6.0, JRuby SDK 1.6.2-p330) [gem]" level="application" />
