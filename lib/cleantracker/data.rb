@@ -32,6 +32,20 @@ module Cleantracker
       groups
     end
 
+    def _split_data(groups, split)
+      return {:default => groups} if split.nil?
+      splitter = lambda { |d| d[split] }
+      splits = {}
+      groups.each_pair do |group, dataset|
+        tmp_splits = group_by(dataset, &splitter)
+        tmp_splits.each_pair do |split_label, subset|
+          splits[split_label] ||= {}
+          splits[split_label][group] = subset
+        end
+      end
+      splits
+    end
+
     def _collect_date_labels(groups)
       group_keys = groups.keys.sort { |a, b| DateTime.parse(a) <=> DateTime.parse(b) }
       date = DateTime.parse(group_keys.first)
@@ -42,6 +56,13 @@ module Cleantracker
         date = date >> 1
       end
       labels
+    end
+
+    def _sort_data(split_labels, group_labels, splits)
+      split_labels.map do |split|
+        groups = splits[split]
+        group_labels.map { |label| groups[label] || [] }
+      end
     end
 
     def self.y_calculator(acc_multiplier, &formula)
@@ -60,38 +81,60 @@ module Cleantracker
     ACC = y_calculator(1) { |d| sum(d) }
     ONE = lambda { 1 }
 
-    def _collect_y_values(groups, labels, y_calc)
-      y_values = {}
-      acc = 0
-      labels.each do |label|
-        acc = y_calc.call(acc, groups[label])
-        y_values[label] = acc
+    def _reduce_y_values(datasets, y_calc)
+      datasets.map do |subsets|
+        acc = 0
+        subsets.map do |data|
+          acc = y_calc.call(acc, data)
+        end
       end
-      y_values
     end
 
-    def _valuate_data(groups, valuator)
-      valuations = {}
-      groups.each_pair do |group, data|
-        valued_data = data.map &valuator
-        valuations[group] = valued_data
+    def _valuate_data(datasets, valuator)
+      datasets.map do |subsets|
+        subsets.map do |data|
+          data.nil? ? [] : (data.map &valuator)
+        end
       end
-      valuations
+    end
+
+    def _calculate_max(reduced_values)
+      sums = []
+      reduced_values.first.size.times do |i|
+        sums << reduced_values.inject(0) { |sum, set| sum + set[i] }
+      end
+
+      sums.max
+    end
+
+    def _calculate_percentages(max, reduced_values)
+      reduced_values.map do |subset|
+        subset.map { |v| v * 100 / max }
+      end
     end
 
     def report(data, options={})
       y_calc = options[:y_calc] || CNT
       valuator = options[:valuator] || ONE
-      groups = group_by(data) { |d| d.created_at.strftime("%b-%Y") }
-      labels = _collect_date_labels(groups)
-      valued_groups = _valuate_data(groups, valuator)
-      y_values = _collect_y_values(valued_groups, labels, y_calc)
-      max = y_values.values.max
 
-      {:x_labels => labels,
-      :x_range => (0...(labels.count)),
-      :y_range => (0..max),
-      :data => [labels.map { |label| y_values[label] * 100 / max }]}
+      groups = group_by(data) { |d| d.created_at.strftime("%b-%Y") }
+      splits = _split_data(groups, options[:split])
+
+      group_labels = _collect_date_labels(groups)
+      split_labels = splits.keys.sort
+
+      sorted_data = _sort_data(split_labels, group_labels, splits)
+      valued_data = _valuate_data(sorted_data, valuator)
+      reduced_values = _reduce_y_values(valued_data, y_calc)
+
+      max = _calculate_max(reduced_values)
+      percentages = _calculate_percentages(max, reduced_values)
+
+      {:x_labels => group_labels,
+       :x_range => (0...(group_labels.count)),
+       :y_range => (0..max),
+       :data => percentages,
+       :data_labels => options[:split] ? split_labels : nil}
     end
 
   end

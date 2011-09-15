@@ -40,6 +40,7 @@ module Cleantracker
       case options[:kind]
         when :line; "cht=lc"
         when :bar; "cht=bvg"
+        when :stacked_bar; "cht=bvs"
         else "cht=lc"
       end
 
@@ -49,12 +50,11 @@ module Cleantracker
       options[:data] ? options[:data].size : 1
     end
 
+    COLORS = %w{5FC9E2 A62315 149931 A67915}
     def chart_color(options={})
-      if _data_count(options) == 1
-        "chco=5FC9E2"
-      else
-        "chco=5FC9E2,27748E"
-      end
+      n = _data_count(options)
+      colors = COLORS[0...n]
+      "chco=#{colors.join(",")}"
     end
 
     def grid_steps(options={})
@@ -74,7 +74,7 @@ module Cleantracker
     end
 
     def bar_width_spacing(options={})
-      if options[:kind] == :bar
+      if [:bar, :stacked_bar].include?(options[:kind])
         "chbh=a,4,20"
       else
         nil

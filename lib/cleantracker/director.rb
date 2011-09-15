@@ -76,11 +76,11 @@ module Cleantracker
     CHARTS = {
       :new_viewers_per_month => BAR.merge(:model => :viewers, :title => "New Viewers/Month"),
       :new_codecasts_per_month => BAR.merge(:model => :codecasts, :title => "New Codecasts/Month"),
-      :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month"),
+      :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month", :chart_kind => :stacked_bar, :split => :level, :valuator => lambda { |l| l[:quantity] }),
       :new_viewings_per_month => BAR.merge(:model => :viewings, :title => "New Viewings/Month"),
       :new_downloads_per_month => BAR.merge(:model => :downloads, :title => "New Download/Month"),
       :viewer_accumulation => LINE.merge(:model => :viewers, :title => "Viewer Accumulation"),
-      :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation"),
+      :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation", :valuator => lambda { |l| l[:quantity] }),
       :viewing_accumulation => LINE.merge(:model => :viewings, :title => "Viewing Accumulation"),
       :download_accumulation => LINE.merge(:model => :downloads, :title => "Download Accumulation"),
       :revenue_per_month => BAR.merge(:model => :payments, :title => "$ Revenue/Month", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 }),
@@ -119,6 +119,7 @@ module Cleantracker
         @view.chart_loading
         models = @cache[options[:model]]
         report = @data.report(models, options)
+        p report
         url = @charts.build_url(options[:chart_kind], options.merge(report))
         @curl.get(url)
       end

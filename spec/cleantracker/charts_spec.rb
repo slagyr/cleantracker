@@ -37,12 +37,13 @@ describe Cleantracker::Charts do
   it "builds the chart type" do
     subject.chart_type(:kind => :line).should == "cht=lc"
     subject.chart_type(:kind => :bar).should == "cht=bvg"
+    subject.chart_type(:kind => :stacked_bar).should == "cht=bvs"
   end
 
   it "build chart color param" do
     subject.chart_color.should == "chco=5FC9E2"
     subject.chart_color(:data => [[]]).should == "chco=5FC9E2"
-    subject.chart_color(:data => [[],[]]).should == "chco=5FC9E2,27748E"
+    subject.chart_color(:data => [[],[]]).should == "chco=5FC9E2,A62315"
   end
 
   it "builds grid step param" do
@@ -60,6 +61,7 @@ describe Cleantracker::Charts do
 
   it "builds bar width and spacing param" do
     subject.bar_width_spacing(:kind => :bar).should == "chbh=a,4,20"
+    subject.bar_width_spacing(:kind => :stacked_bar).should == "chbh=a,4,20"
     subject.bar_width_spacing(:kind => :line).should == nil
   end
 
