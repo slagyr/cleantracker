@@ -14,8 +14,7 @@ module Graphs
   end
 
   def load_chart(id)
-    load_method = "load_#{id}_chart".to_sym
-    production.director.send(load_method, DEFAULT_OPTIONS)
+    production.director.load_chart(id, DEFAULT_OPTIONS)
   end
 
   def display_chart(title, image_path)

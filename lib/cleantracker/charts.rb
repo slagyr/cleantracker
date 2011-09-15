@@ -3,7 +3,8 @@ module Cleantracker
 
     PARAMS = [:foreground, :axis_ranges, :axis_labels, :axis_label_styles,
               :axis_ticks, :chart_size, :chart_type, :chart_color,
-              :grid_steps, :line_styles, :fill_markers, :data]
+              :grid_steps, :line_styles, :fill_markers, :bar_width_spacing,
+              :data_labels, :legend_location, :legend_style, :data]
 
     def foreground(options={})
       "chf=bg,s,1E1E1E"
@@ -36,11 +37,24 @@ module Cleantracker
     end
 
     def chart_type(options={})
-      "cht=lc"
+      case options[:kind]
+        when :line; "cht=lc"
+        when :bar; "cht=bvg"
+        else "cht=lc"
+      end
+
+    end
+
+    def _data_count(options)
+      options[:data] ? options[:data].size : 1
     end
 
     def chart_color(options={})
-      "chco=5FC9E2"
+      if _data_count(options) == 1
+        "chco=5FC9E2"
+      else
+        "chco=5FC9E2,27748E"
+      end
     end
 
     def grid_steps(options={})
@@ -52,17 +66,55 @@ module Cleantracker
     end
 
     def fill_markers(options={})
-      "chm=B,5FC9E299,0,0,0"
+      if options[:kind] == :line
+        "chm=B,5FC9E299,0,0,0"
+      else
+        nil
+      end
+    end
+
+    def bar_width_spacing(options={})
+      if options[:kind] == :bar
+        "chbh=a,4,20"
+      else
+        nil
+      end
+    end
+
+    def data_labels(options={})
+      if options[:data_labels]
+        "chdl=#{options[:data_labels].join("|")}"
+      else
+        nil
+      end
+    end
+
+    def legend_location(options={})
+      "chdlp=b"
+    end
+
+    def legend_style(options={})
+      "chdls=CCCCCC,12"
     end
 
     def data(options={})
-      "chd=t:#{options[:data].join(",")}"
+      data_as_values = options[:data].map { |d| d.join(",") }
+      "chd=t:#{data_as_values.join("|")}"
     end
 
-    def line_url(options={})
+    def build_url(kind, options)
+      options[:kind] = kind
       params = PARAMS.map { |p| self.send(p, options) }
       params.reject! { |p| p.nil? }
       "http://chart.apis.google.com/chart?#{params.join("&")}"
+    end
+
+    def line_url(options={})
+      build_url(:line, options)
+    end
+
+    def bar_url(options={})
+      build_url(:bar, options)
     end
 
   end

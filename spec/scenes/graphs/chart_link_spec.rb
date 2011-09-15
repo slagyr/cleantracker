@@ -14,8 +14,8 @@ describe "Chart Links" do
   end
 
   it "triggers a load on click" do
-    production.director.should_receive(:load_viewer_history_chart)
-    scene.find("viewer_history").mouse_clicked(nil)
+    production.director.should_receive(:load_new_viewers_per_month_chart)
+    scene.find("new_viewers_per_month").mouse_clicked(nil)
   end
 
 end

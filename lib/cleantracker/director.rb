@@ -27,8 +27,8 @@ module Cleantracker
     end
 
     def login(options)
-      #@client = Cleandata::Client.new(options.merge(:host => "localhost", :port => 8080))
-      @client = Cleandata::Client.new(options)
+      @client = Cleandata::Client.new(options.merge(:host => "localhost", :port => 8080))
+      #@client = Cleandata::Client.new(options)
       begin
         @client.connection
         view.login_succeeded
@@ -52,7 +52,7 @@ module Cleantracker
 
     def graph_scene_ready(view, options)
       @view = view
-      load_viewer_history_chart(options)
+      load_chart(:viewer_accumulation, options)
     end
 
     def load_clean_data
@@ -71,33 +71,26 @@ module Cleantracker
       end
     end
 
-    def _load_history_chart(model, title, options)
-      @view.chart_loading
-      viewers = @cache[model]
-      report = @data.history_report_for(viewers)
-      url = @charts.line_url(options.merge(report))
-      path = @curl.get(url)
-      @view.display_chart(title, path)
-    end
+    BAR = {:y_calc => Data::CNT, :chart_kind => :bar, :valuator => Data::ONE}
+    LINE = {:y_calc => Data::ACC, :chart_kind => :line, :valuator => Data::ONE}
+    CHARTS = {
+      :new_viewers_per_month => BAR.merge(:model => :viewers, :title => "New Viewers/Month"),
+      :new_codecasts_per_month => BAR.merge(:model => :codecasts, :title => "New Codecasts/Month"),
+      :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month"),
+      :new_viewings_per_month => BAR.merge(:model => :viewings, :title => "New Viewings/Month"),
+      :new_downloads_per_month => BAR.merge(:model => :downloads, :title => "New Download/Month"),
+      :viewer_accumulation => LINE.merge(:model => :viewers, :title => "Viewer Accumulation"),
+      :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation"),
+      :viewing_accumulation => LINE.merge(:model => :viewings, :title => "Viewing Accumulation"),
+      :download_accumulation => LINE.merge(:model => :downloads, :title => "Download Accumulation"),
+      :revenue_per_month => BAR.merge(:model => :payments, :title => "$ Revenue/Month", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 }),
+      :revenue_accumulation => LINE.merge(:model => :payments, :title => "$ Revenue Accumlation", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 })
+    }
 
-    def load_viewer_history_chart(options={})
-      _load_history_chart(:viewers, "Viewer History", options)
-    end
-
-    def load_codecast_history_chart(options={})
-      _load_history_chart(:codecasts, "Codecast History", options)
-    end
-
-    def load_license_history_chart(options={})
-      _load_history_chart(:licenses, "License History", options)
-    end
-
-    def load_viewing_history_chart(options={})
-      _load_history_chart(:viewings, "Viewing History", options)
-    end
-
-    def load_download_history_chart(options={})
-      _load_history_chart(:downloads, "Download History", options)
+    def load_chart(name, options={})
+      chart_options = CHARTS[name.to_sym]
+      raise "Missing chart #{name}" if chart_options.nil?
+      _load_chart(chart_options.merge(options))
     end
 
     private
@@ -109,6 +102,27 @@ module Cleantracker
       ensure
         @view.finished_load
       end
+    end
+
+    def _with_chart_caching(key)
+      @cache[:charts] ||= {}
+      path = @cache[:charts][key]
+      if path.nil?
+        path = yield
+        @cache[:charts][key] = path
+      end
+      path
+    end
+
+    def _load_chart(options)
+      path = _with_chart_caching(options[:title]) do
+        @view.chart_loading
+        models = @cache[options[:model]]
+        report = @data.report(models, options)
+        url = @charts.build_url(options[:chart_kind], options.merge(report))
+        @curl.get(url)
+      end
+      @view.display_chart(options[:title], path)
     end
 
   end

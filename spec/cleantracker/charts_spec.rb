@@ -35,11 +35,14 @@ describe Cleantracker::Charts do
   end
 
   it "builds the chart type" do
-    subject.chart_type.should == "cht=lc"
+    subject.chart_type(:kind => :line).should == "cht=lc"
+    subject.chart_type(:kind => :bar).should == "cht=bvg"
   end
 
   it "build chart color param" do
     subject.chart_color.should == "chco=5FC9E2"
+    subject.chart_color(:data => [[]]).should == "chco=5FC9E2"
+    subject.chart_color(:data => [[],[]]).should == "chco=5FC9E2,27748E"
   end
 
   it "builds grid step param" do
@@ -51,18 +54,39 @@ describe Cleantracker::Charts do
   end
 
   it "builds fill markers params" do
-    subject.fill_markers.should == "chm=B,5FC9E299,0,0,0"
+    subject.fill_markers(:kind => :line).should == "chm=B,5FC9E299,0,0,0"
+    subject.fill_markers(:kind => :bar).should == nil
+  end
+
+  it "builds bar width and spacing param" do
+    subject.bar_width_spacing(:kind => :bar).should == "chbh=a,4,20"
+    subject.bar_width_spacing(:kind => :line).should == nil
+  end
+
+  it "build data label param" do
+    subject.data_labels(:data_labels => ["A", "B"]).should == "chdl=A|B"
+    subject.data_labels().should == nil
+  end
+
+  it "builds legend location param" do
+    subject.legend_location.should == "chdlp=b"
+  end
+
+  it "builds legent style param" do
+    subject.legend_style.should == "chdls=CCCCCC,12"
   end
 
   it "build the data param" do
-    subject.data(:data => [1, 2, 3, 4, 5]).should == "chd=t:1,2,3,4,5"
-    subject.data(:data => [1.2, 3.4, 5.6, 7.8]).should == "chd=t:1.2,3.4,5.6,7.8"
+    subject.data(:data => [[1, 2, 3, 4, 5]]).should == "chd=t:1,2,3,4,5"
+    subject.data(:data => [[1.2, 3.4, 5.6, 7.8]]).should == "chd=t:1.2,3.4,5.6,7.8"
+    subject.data(:data => [[1, 2, 3], [4, 5, 6]]).should == "chd=t:1,2,3|4,5,6"
   end
 
   it "builds a line chart url" do
-    options = {:data => [1, 2, 3]}
+    options = {:data => [[1, 2, 3]]}
     url = subject.line_url(options)
     url.include?("http://chart.apis.google.com/chart").should == true
+    url.include?("cht=lc").should == true
     url.include?(subject.foreground(options)).should == true
     url.include?(subject.axis_label_styles(options)).should == true
     url.include?(subject.axis_ticks(options)).should == true
@@ -73,5 +97,13 @@ describe Cleantracker::Charts do
     url.include?(subject.line_styles(options)).should == true
     url.include?(subject.fill_markers(options)).should == true
     url.include?(subject.data(options)).should == true
+  end
+
+  it "builds a bar chart" do
+    options = {:data => [[1, 2, 3]]}
+    url = subject.bar_url(options)
+    url.include?("http://chart.apis.google.com/chart").should == true
+    url.include?("cht=bvg").should == true
+    url.include?(subject.bar_width_spacing(options)).should == true
   end
 end

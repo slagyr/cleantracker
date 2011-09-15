@@ -7,12 +7,21 @@ body {
 }
 
 chart_list {
-  width 150
+  width 165
+}
+
+link_group {
+  extends :para
+  width "100%"
+  horizontal_alignment :center
+  text_color "#6D6F71"
+  top_margin 10
 }
 
 chart_link {
   extends :para
   width "100%"
+  font_size 14
   top_margin 5
   hover {
     text_color "#4DC5E0"
@@ -32,4 +41,7 @@ chart_title {
   font_size "20"
   font_style "bold"
   horizontal_alignment :center
+}
+
+chart {
 }

@@ -44,25 +44,54 @@ module Cleantracker
       labels
     end
 
-    def _collect_counts(groups, labels)
-      counts = {}
-      labels.each do |label|
-        count = groups[label].nil? ? 0 : groups[label].size
-        counts[label] = count
+    def self.y_calculator(acc_multiplier, &formula)
+      lambda do |acc, data|
+        result = (acc * acc_multiplier)
+        return result if data.nil?
+        result + formula.call(data)
       end
-      counts
     end
 
-    def history_report_for(data)
+    def self.sum(data)
+      data.inject(0) { |sum, value| sum + value }
+    end
+
+    CNT = y_calculator(0) { |d| sum(d) }
+    ACC = y_calculator(1) { |d| sum(d) }
+    ONE = lambda { 1 }
+
+    def _collect_y_values(groups, labels, y_calc)
+      y_values = {}
+      acc = 0
+      labels.each do |label|
+        acc = y_calc.call(acc, groups[label])
+        y_values[label] = acc
+      end
+      y_values
+    end
+
+    def _valuate_data(groups, valuator)
+      valuations = {}
+      groups.each_pair do |group, data|
+        valued_data = data.map &valuator
+        valuations[group] = valued_data
+      end
+      valuations
+    end
+
+    def report(data, options={})
+      y_calc = options[:y_calc] || CNT
+      valuator = options[:valuator] || ONE
       groups = group_by(data) { |d| d.created_at.strftime("%b-%Y") }
       labels = _collect_date_labels(groups)
-      counts = _collect_counts(groups, labels)
-      max = counts.values.max
+      valued_groups = _valuate_data(groups, valuator)
+      y_values = _collect_y_values(valued_groups, labels, y_calc)
+      max = y_values.values.max
 
       {:x_labels => labels,
       :x_range => (0...(labels.count)),
       :y_range => (0..max),
-      :data => labels.map { |label| counts[label] * 100 / max }}
+      :data => [labels.map { |label| y_values[label] * 100 / max }]}
     end
 
   end

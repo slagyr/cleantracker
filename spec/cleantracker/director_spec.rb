@@ -23,22 +23,22 @@ describe Cleantracker::Director do
     director.login_scene_ready(view)
     director.view.should == view
   end
-
-  it "failed login" do
-    Cleandata::Client.should_receive(:new).with(:username => "blah", :password => "blah").and_return(client)
-    client.should_receive(:connection).and_raise("Nope!")
-    view.should_receive(:login_failed).with("Nope!")
-
-    director.login(:username => "blah", :password => "blah")
-  end
-
-  it "successful login" do
-    Cleandata::Client.should_receive(:new).with(:username => "blah", :password => "blah").and_return(client)
-    client.should_receive(:connection).and_return(connection)
-    view.should_receive(:login_succeeded)
-
-    director.login(:username => "blah", :password => "blah")
-  end
+  #
+  #it "failed login" do
+  #  Cleandata::Client.should_receive(:new).with(:username => "blah", :password => "blah").and_return(client)
+  #  client.should_receive(:connection).and_raise("Nope!")
+  #  view.should_receive(:login_failed).with("Nope!")
+  #
+  #  director.login(:username => "blah", :password => "blah")
+  #end
+  #
+  #it "successful login" do
+  #  Cleandata::Client.should_receive(:new).with(:username => "blah", :password => "blah").and_return(client)
+  #  client.should_receive(:connection).and_return(connection)
+  #  view.should_receive(:login_succeeded)
+  #
+  #  director.login(:username => "blah", :password => "blah")
+  #end
 
   it "prepares loading scene with no cached data" do
     director.view = nil
@@ -91,22 +91,65 @@ describe Cleantracker::Director do
 
   it "prepare chart scene" do
     director.view = nil
-    director.should_receive(:load_viewer_history_chart).with(:options)
+    director.should_receive(:load_chart).with(:viewer_accumulation, {:default => :options})
 
-    director.graph_scene_ready(view, :options)
+    director.graph_scene_ready(view, {:default => :options})
 
     director.view.should == view
   end
 
-  it "loads viewer history chart" do
+  it "loads new viewers/month chart" do
     view.should_receive(:chart_loading)
-    cache.should_receive(:[]).with(:viewers).and_return(:cached_viewers)
-    data.should_receive(:history_report_for).with(:cached_viewers).and_return(:data => [:fooey])
-    charts.should_receive(:line_url).with(:data => [:fooey], :width => 600, :height => 500).and_return("http://some.url")
+    cache[:viewers] = :cached_viewers
+    data.should_receive(:report) do |data, options|
+      data.should == :cached_viewers
+      options[:y_calc].should == Cleantracker::Data::CNT
+      {:data => [:fooey]}
+    end
+    charts.should_receive(:build_url) do |kind, options|
+      kind.should == :bar
+      options[:data].should == [:fooey]
+      options[:width].should == 600
+      options[:height].should == 500
+      "http://some.url"
+    end
     curl.should_receive(:get).with("http://some.url").and_return("/path/to/new_image")
-    view.should_receive(:display_chart).with("Viewer History", "/path/to/new_image")
+    view.should_receive(:display_chart).with("New Viewers/Month", "/path/to/new_image")
 
-    director.load_viewer_history_chart(:width => 600, :height => 500)
+    director.load_chart(:new_viewers_per_month, :width => 600, :height => 500)
+    director.cache[:charts]["New Viewers/Month"].should_not == nil
+  end
+
+  it "caches images" do
+    director.cache[:charts] = {"New Viewers/Month" =>  "/some/path"}
+
+    view.should_not_receive(:chart_loading)
+    data.should_not_receive(:new_per_month_report)
+    view.should_receive(:display_chart).with("New Viewers/Month", "/some/path")
+
+    director.load_chart(:new_viewers_per_month, :width => 600, :height => 500)
+  end
+
+  it "loads viewer accumulation chart" do
+    view.should_receive(:chart_loading)
+    cache[:viewers] = :cached_viewers
+    data.should_receive(:report) do |data, options|
+      data.should == :cached_viewers
+      options[:y_calc].should == Cleantracker::Data::ACC
+      {:data => [:fooey]}
+    end
+    charts.should_receive(:build_url) do |kind, options|
+      kind.should == :line
+      options[:data].should == [:fooey]
+      options[:width].should == 600
+      options[:height].should == 500
+      "http://some.url"
+    end
+    curl.should_receive(:get).with("http://some.url").and_return("/path/to/new_image")
+    view.should_receive(:display_chart).with("Viewer Accumulation", "/path/to/new_image")
+
+    director.load_chart(:viewer_accumulation, :width => 600, :height => 500)
+    director.cache[:charts]["Viewer Accumulation"].should_not == nil
   end
 
 end
