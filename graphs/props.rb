@@ -12,6 +12,7 @@ body do
     link_group :text => "Licenses"
     chart_link :id => "new_licenses_per_month", :text => "New Licenses/Month"
     chart_link :id => "license_accumulation", :text => "License Accumulation"
+    chart_link :id => "licenses_per_codecast", :text => "License/Codecast"
     link_group :text => "Viewings/Downloads"
     chart_link :id => "new_viewings_per_month", :text => "New Viewings/Month"
     chart_link :id => "viewing_accumulation", :text => "Viewing Accumulation"
@@ -20,6 +21,8 @@ body do
     link_group :text => "Finances"
     chart_link :id => "revenue_per_month", :text => "Revenue/Month"
     chart_link :id => "revenue_accumulation", :text => "Revenue Accumulation"
+    chart_link :id => "paypal_fee_accumulation", :text => "Paypal Fee Accumulation"
+    chart_link :id => "revenue_per_codecast", :text => "Revenue/Codecast"
   end
   chart_frame :id => :chart_frame do
     para :text => "Your graph is loading..."

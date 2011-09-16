@@ -2,6 +2,7 @@ require 'cleandata/client'
 require 'cleantracker/charts'
 require 'cleantracker/data'
 require 'cleantracker/curl'
+require 'cleantracker/models'
 
 module Cleantracker
 
@@ -20,6 +21,7 @@ module Cleantracker
       @cache = options[:cache] || {}
       @curl = options[:curl] || Curl.new
       @view = options[:view]
+      @models = options[:models] || Models.new
     end
 
     def login_scene_ready(view)
@@ -76,15 +78,18 @@ module Cleantracker
     CHARTS = {
       :new_viewers_per_month => BAR.merge(:model => :viewers, :title => "New Viewers/Month"),
       :new_codecasts_per_month => BAR.merge(:model => :codecasts, :title => "New Codecasts/Month"),
-      :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month", :chart_kind => :stacked_bar, :split => :level, :valuator => lambda { |l| l[:quantity] }),
+      :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month", :chart_kind => :stacked_bar, :split => :level, :valuator => :quantity),
       :new_viewings_per_month => BAR.merge(:model => :viewings, :title => "New Viewings/Month"),
       :new_downloads_per_month => BAR.merge(:model => :downloads, :title => "New Download/Month"),
       :viewer_accumulation => LINE.merge(:model => :viewers, :title => "Viewer Accumulation"),
-      :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation", :valuator => lambda { |l| l[:quantity] }),
+      :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation", :valuator => :quantity),
       :viewing_accumulation => LINE.merge(:model => :viewings, :title => "Viewing Accumulation"),
       :download_accumulation => LINE.merge(:model => :downloads, :title => "Download Accumulation"),
       :revenue_per_month => BAR.merge(:model => :payments, :title => "$ Revenue/Month", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 }),
-      :revenue_accumulation => LINE.merge(:model => :payments, :title => "$ Revenue Accumlation", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 })
+      :revenue_accumulation => LINE.merge(:model => :payments, :title => "$ Revenue Accumlation", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 }),
+      :paypal_fee_accumulation => LINE.merge(:model => :payments, :title => "$ Paypal Fee Accumlation", :valuator => lambda{ |p| (p[:fee] || 0)/100.0 }),
+      :licenses_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "Licenses/Codecast", :chart_kind => :stacked_bar, :split => :level, :valuator => :quantity, :grouper => :codecast_abbr),
+      :revenue_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "$ Revenue/Codecast", :grouper => :codecast_abbr, :valuator => lambda { |l| (l[:unit_price] * l[:quantity])/100.0 })
     }
 
     def load_chart(name, options={})
@@ -92,8 +97,6 @@ module Cleantracker
       raise "Missing chart #{name}" if chart_options.nil?
       _load_chart(chart_options.merge(options))
     end
-
-    private
 
     def load_data(model)
       begin
@@ -116,14 +119,29 @@ module Cleantracker
 
     def _load_chart(options)
       path = _with_chart_caching(options[:title]) do
+        _call_action(options[:before])
         @view.chart_loading
         models = @cache[options[:model]]
         report = @data.report(models, options)
-        p report
         url = @charts.build_url(options[:chart_kind], options.merge(report))
         @curl.get(url)
       end
       @view.display_chart(options[:title], path)
+    end
+
+    def _call_action(action)
+      return if action.nil?
+      if action.is_a?(Symbol)
+        self.send(action)
+      else
+        action.call
+      end
+    end
+
+    def _license_abbrs
+      if cache[:licenses].first[:codecast_abbr].nil?
+        @models.add_codecast_abbreviations(@cache[:codecasts], @cache[:licenses])
+      end
     end
 
   end

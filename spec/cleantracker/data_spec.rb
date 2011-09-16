@@ -47,8 +47,8 @@ describe Cleantracker::Data do
   end
 
   it "can prepare count report using accumulating formula" do
-    result = subject.report(data, :y_calc => Cleantracker::Data::ACC, :valuator => lambda{ |d| d[:amount] * 10 })
-    result[:y_range].should == (0..560)
+    result = subject.report(data, :y_calc => Cleantracker::Data::ACC, :valuator => :amount)
+    result[:y_range].should == (0..56)
     result[:x_range].should == (0...13)
     result[:x_labels].should == %w{Jan-2010 Feb-2010 Mar-2010 Apr-2010 May-2010 Jun-2010 Jul-2010 Aug-2010 Sep-2010 Oct-2010 Nov-2010 Dec-2010 Jan-2011}
     result[:data].should == [[28, 37, 69, 69, 69, 69, 69, 69, 69, 69, 69, 69, 100]]
@@ -61,6 +61,14 @@ describe Cleantracker::Data do
     result[:x_labels].should == %w{Jan-2010 Feb-2010 Mar-2010 Apr-2010 May-2010 Jun-2010 Jul-2010 Aug-2010 Sep-2010 Oct-2010 Nov-2010 Dec-2010 Jan-2011}
     result[:data].should == [[100,0,50,0,0,0,0,0,0,0,0,0,0],[0,50,50,0,0,0,0,0,0,0,0,0,50]]
     result[:data_labels].should == ["A", "B"]
+  end
+
+  it "can group by custom fields" do
+    result = subject.report(data, :grouper => :type)
+    result[:y_range].should == (0..3)
+    result[:x_range].should == (0...2)
+    result[:x_labels].should == %w{A B}
+    result[:data].should == [[100, 100]]
   end
 
 end

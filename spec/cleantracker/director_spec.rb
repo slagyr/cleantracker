@@ -152,4 +152,14 @@ describe Cleantracker::Director do
     director.cache[:charts]["Viewer Accumulation"].should_not == nil
   end
 
+  it "loads viewer accumulation chart" do
+    data.stub(:report).and_return({:data => [:fooey]})
+
+    @foo = nil
+    action = lambda { @foo = "FOO" }
+    director._load_chart(:before => action)
+
+    @foo.should == "FOO"
+  end
+
 end
