@@ -23,6 +23,14 @@ body do
     chart_link :id => "revenue_accumulation", :text => "Revenue Accumulation"
     chart_link :id => "paypal_fee_accumulation", :text => "Paypal Fee Accumulation"
     chart_link :id => "revenue_per_codecast", :text => "Revenue/Codecast"
+    chart_link :id => "revenue_per_month_per_codecast", :text => "Revenue/Codecast/Month"
+    chart_link :id => "e1_revenue_per_month", :text => "E1 Revenue/Month"
+    chart_link :id => "e2_revenue_per_month", :text => "E2 Revenue/Month"
+    chart_link :id => "e3_revenue_per_month", :text => "E3 Revenue/Month"
+    chart_link :id => "e4_revenue_per_month", :text => "E4 Revenue/Month"
+    chart_link :id => "e5_revenue_per_month", :text => "E5 Revenue/Month"
+    chart_link :id => "e6_1_revenue_per_month", :text => "E6-1 Revenue/Month"
+    chart_link :id => "e6_2_revenue_per_month", :text => "E6-2 Revenue/Month"
   end
   chart_frame :id => :chart_frame do
     para :text => "Your graph is loading..."

@@ -29,8 +29,8 @@ module Cleantracker
     end
 
     def login(options)
-      @client = Cleandata::Client.new(options.merge(:host => "localhost", :port => 8080))
-      #@client = Cleandata::Client.new(options)
+      #@client = Cleandata::Client.new(options.merge(:host => "localhost", :port => 8080))
+      @client = Cleandata::Client.new(options)
       begin
         @client.connection
         view.login_succeeded
@@ -75,21 +75,30 @@ module Cleantracker
 
     BAR = {:y_calc => Data::CNT, :chart_kind => :bar, :valuator => Data::ONE}
     LINE = {:y_calc => Data::ACC, :chart_kind => :line, :valuator => Data::ONE}
+    LICENSE_REV = lambda { |l| (l[:unit_price] * l[:quantity])/100.0 }
     CHARTS = {
-      :new_viewers_per_month => BAR.merge(:model => :viewers, :title => "New Viewers/Month"),
-      :new_codecasts_per_month => BAR.merge(:model => :codecasts, :title => "New Codecasts/Month"),
-      :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month", :chart_kind => :stacked_bar, :split => :level, :valuator => :quantity),
-      :new_viewings_per_month => BAR.merge(:model => :viewings, :title => "New Viewings/Month"),
-      :new_downloads_per_month => BAR.merge(:model => :downloads, :title => "New Download/Month"),
-      :viewer_accumulation => LINE.merge(:model => :viewers, :title => "Viewer Accumulation"),
-      :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation", :valuator => :quantity),
-      :viewing_accumulation => LINE.merge(:model => :viewings, :title => "Viewing Accumulation"),
-      :download_accumulation => LINE.merge(:model => :downloads, :title => "Download Accumulation"),
-      :revenue_per_month => BAR.merge(:model => :payments, :title => "$ Revenue/Month", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 }),
-      :revenue_accumulation => LINE.merge(:model => :payments, :title => "$ Revenue Accumlation", :valuator => lambda{ |p| (p[:amount] || 0)/100.0 }),
-      :paypal_fee_accumulation => LINE.merge(:model => :payments, :title => "$ Paypal Fee Accumlation", :valuator => lambda{ |p| (p[:fee] || 0)/100.0 }),
-      :licenses_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "Licenses/Codecast", :chart_kind => :stacked_bar, :split => :level, :valuator => :quantity, :grouper => :codecast_abbr),
-      :revenue_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "$ Revenue/Codecast", :grouper => :codecast_abbr, :valuator => lambda { |l| (l[:unit_price] * l[:quantity])/100.0 })
+            :new_viewers_per_month => BAR.merge(:model => :viewers, :title => "New Viewers/Month"),
+            :new_codecasts_per_month => BAR.merge(:model => :codecasts, :title => "New Codecasts/Month"),
+            :new_licenses_per_month => BAR.merge(:model => :licenses, :title => "New Licenses/Month", :chart_kind => :stacked_bar, :split => :level, :valuator => :quantity),
+            :new_viewings_per_month => BAR.merge(:model => :viewings, :title => "New Viewings/Month"),
+            :new_downloads_per_month => BAR.merge(:model => :downloads, :title => "New Download/Month"),
+            :viewer_accumulation => LINE.merge(:model => :viewers, :title => "Viewer Accumulation"),
+            :license_accumulation => LINE.merge(:model => :licenses, :title => "License Accumulation", :valuator => :quantity),
+            :viewing_accumulation => LINE.merge(:model => :viewings, :title => "Viewing Accumulation"),
+            :download_accumulation => LINE.merge(:model => :downloads, :title => "Download Accumulation"),
+            :revenue_per_month => BAR.merge(:model => :payments, :title => "$ Revenue/Month", :valuator => lambda { |p| (p[:amount] || 0)/100.0 }),
+            :revenue_accumulation => LINE.merge(:model => :payments, :title => "$ Revenue Accumlation", :valuator => lambda { |p| (p[:amount] || 0)/100.0 }),
+            :paypal_fee_accumulation => LINE.merge(:model => :payments, :title => "$ Paypal Fee Accumlation", :valuator => lambda { |p| (p[:fee] || 0)/100.0 }),
+            :licenses_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "Licenses/Codecast", :chart_kind => :stacked_bar, :split => :level, :valuator => :quantity, :grouper => :codecast_abbr),
+            :revenue_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "$ Revenue/Codecast", :grouper => :codecast_abbr, :valuator => LICENSE_REV),
+            :revenue_per_month_per_codecast => BAR.merge(:before => :_license_abbrs, :model => :licenses, :title => "$ Revenue/Month/Episode", :valuator => LICENSE_REV, :split => :codecast_abbr),
+            :e1_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E1"} }, :title => "E1 Revenue/Month", :valuator => LICENSE_REV),
+            :e2_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E2"} }, :title => "E2 Revenue/Month", :valuator => LICENSE_REV),
+            :e3_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E3"} }, :title => "E3 Revenue/Month", :valuator => LICENSE_REV),
+            :e4_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E4"} }, :title => "E4 Revenue/Month", :valuator => LICENSE_REV),
+            :e5_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E5"} }, :title => "E5 Revenue/Month", :valuator => LICENSE_REV),
+            :e6_1_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E6-1"} }, :title => "E6-1 Revenue/Month", :valuator => LICENSE_REV),
+            :e6_2_revenue_per_month => BAR.merge(:before => :_license_abbrs, :model => lambda { |cache| cache[:licenses].select { |l| l[:codecast_abbr] == "E6-2"} }, :title => "E6-2 Revenue/Month", :valuator => LICENSE_REV),
     }
 
     def load_chart(name, options={})
@@ -117,11 +126,16 @@ module Cleantracker
       path
     end
 
+    def _load_models(options)
+      return nil unless options[:model]
+      options[:model].is_a?(Symbol) ? @cache[options[:model]] : options[:model].call(@cache)
+    end
+
     def _load_chart(options)
       path = _with_chart_caching(options[:title]) do
         _call_action(options[:before])
         @view.chart_loading
-        models = @cache[options[:model]]
+        models = _load_models(options)
         report = @data.report(models, options)
         url = @charts.build_url(options[:chart_kind], options.merge(report))
         @curl.get(url)
@@ -139,9 +153,11 @@ module Cleantracker
     end
 
     def _license_abbrs
-      if cache[:licenses].first[:codecast_abbr].nil?
-        @models.add_codecast_abbreviations(@cache[:codecasts], @cache[:licenses])
-      end
+      @models.add_codecast_abbreviations(@cache[:codecasts], @cache[:licenses])
+    end
+
+    def _codecast_abbrs
+      @models.add_abbreviations(@cache[:codecasts])
     end
 
   end

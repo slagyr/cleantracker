@@ -80,8 +80,9 @@ describe Cleantracker::Charts do
 
   it "build the data param" do
     subject.data(:data => [[1, 2, 3, 4, 5]]).should == "chd=t:1,2,3,4,5"
-    subject.data(:data => [[1.2, 3.4, 5.6, 7.8]]).should == "chd=t:1.2,3.4,5.6,7.8"
+    subject.data(:data => [[1.2, 3.4, 5.6, 7.8]]).should == "chd=t:1,3,6,8"
     subject.data(:data => [[1, 2, 3], [4, 5, 6]]).should == "chd=t:1,2,3|4,5,6"
+    subject.data(:data => [[0.0, 2.12345, 3.55555]]).should == "chd=t:0,2,4"
   end
 
   it "builds a line chart url" do

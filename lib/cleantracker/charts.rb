@@ -50,7 +50,8 @@ module Cleantracker
       options[:data] ? options[:data].size : 1
     end
 
-    COLORS = %w{5FC9E2 A62315 149931 A67915}
+    COLOR_CHARS = ('A'..'F').to_a + (0..9).to_a
+    COLORS = %w{5FC9E2 A62315 149931 A67915} + (0..100).map { (0..5).map { COLOR_CHARS[rand(16)] }.join }
     def chart_color(options={})
       n = _data_count(options)
       colors = COLORS[0...n]
@@ -98,8 +99,13 @@ module Cleantracker
     end
 
     def data(options={})
-      data_as_values = options[:data].map { |d| d.join(",") }
-      "chd=t:#{data_as_values.join("|")}"
+      data_strings = options[:data].map { |d| d.map { |p| _format_datapoint(p) } }
+      combined_subsets = data_strings.map { |d| d.join(",") }
+      "chd=t:#{combined_subsets.join("|")}"
+    end
+
+    def _format_datapoint(p)
+      (p + 0.5).to_i.to_s
     end
 
     def build_url(kind, options)

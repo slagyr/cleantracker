@@ -123,14 +123,19 @@ module Cleantracker
       end
     end
 
-    def _calculate_max(reduced_values)
+    def _calculate_max(reduced_values, chart_type)
       sums = []
-      reduced_values.first.size.times do |i|
-        sums << reduced_values.inject(0) { |sum, set| sum + set[i] }
-      end
 
+      if chart_type.to_s.include?("stacked")
+        reduced_values.first.size.times do |i|
+          sums << reduced_values.inject(0) { |sum, set| sum + set[i] }
+        end
+      else
+        sums = reduced_values.map { |set| set.max }
+      end
       sums.max
     end
+
 
     def _calculate_percentages(max, reduced_values)
       reduced_values.map do |subset|
@@ -149,7 +154,7 @@ module Cleantracker
       valued_data = _valuate_data(sorted_data, options[:valuator])
       reduced_values = _reduce_y_values(valued_data, options[:y_calc])
 
-      max = _calculate_max(reduced_values)
+      max = _calculate_max(reduced_values, options[:chart_kind])
       percentages = _calculate_percentages(max, reduced_values)
 
       {:x_labels => group_labels,

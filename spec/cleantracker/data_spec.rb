@@ -71,4 +71,12 @@ describe Cleantracker::Data do
     result[:data].should == [[100, 100]]
   end
 
+  it "can split with indepenant max or combined max" do
+    result = subject.report(data, :chart_kind => :bar, :valuator => :amount, :split => :type)
+    result[:y_range].should == (0..17)
+
+    result = subject.report(data, :chart_kind => :stacked_bar, :valuator => :amount, :split => :type)
+    result[:y_range].should == (0..18)
+  end
+
 end
