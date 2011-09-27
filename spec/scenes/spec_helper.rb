@@ -6,17 +6,6 @@ require "limelight/limelight_init"
 # Set the Gem home to the frozen gems
 $PRODUCTION_PATH = File.expand_path(File.dirname(__FILE__) + "/../../")
 
-#Gem.use_paths(File.join($PRODUCTION_PATH , "__resources", "gems"), Gem.default_path)
-#
-#
-#Dir.glob(File.join("__resources", "gems", "gems", "**", "lib")).each do |dir|
-#  $: << dir
-#end
-
-
-#- Copyright © 2008-2011 8th Light, Inc. All Rights Reserved.
-#- Limelight and all included source files are distributed under terms of the MIT License.
-
 require 'limelight/producer'
 require 'limelight/production'
 require 'limelight/scene'

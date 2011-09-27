@@ -2,7 +2,10 @@
 <module type="RUBY_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/lib" isTestSource="false" />
+    </content>
     <orderEntry type="jdk" jdkName="JRuby SDK 1.6.2-p330" jdkType="JRUBY_SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v2.6.0, JRuby SDK 1.6.2-p330) [gem]" level="application" />

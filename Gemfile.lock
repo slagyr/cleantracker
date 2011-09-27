@@ -1,6 +1,13 @@
 GIT
+  remote: git@github.com:slagyr/cleananalytics_rb.git
+  revision: 5d52c8c51b764bfea3bb07877e2cc8a5b8b88399
+  ref: master
+  specs:
+    cleananalytics (1.0.0)
+
+GIT
   remote: git@github.com:slagyr/cleandata_rb.git
-  revision: 3a13fc19bfb4ca5e9a9a8b7bd0e74ac9fa455566
+  revision: 80948b7e78894845005322aac0010b696e8b97f4
   ref: master
   specs:
     cleandata (1.0.0)
@@ -22,9 +29,9 @@ GEM
 
 PLATFORMS
   java
-  ruby
 
 DEPENDENCIES
+  cleananalytics!
   cleandata!
   limelight (~> 0.5.0)
   rake
