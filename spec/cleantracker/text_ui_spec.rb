@@ -13,7 +13,7 @@ describe Cleantracker::TextUi do
   it "lists the usage" do
     director.should_receive(:chart_list).and_return(["chart1", "chart2"])
     message = ui.usage
-    message.include?("cleantracker <username> <graph>").should == true
+    message.include?("cleantracker [options] chart").should == true
     message.include?("chart1").should == true
     message.include?("chart2").should == true
   end

@@ -5,4 +5,5 @@ module LoginButton
     password = scene.find(:password_field).text
     production.director.login(:username => username, :password => password)
   end
+
 end

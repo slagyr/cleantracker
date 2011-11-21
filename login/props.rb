@@ -17,5 +17,3 @@ login_pane do
   end
 end
 error :id => "error_message", :text => "This is a sample error", :transparency => 100
-
-

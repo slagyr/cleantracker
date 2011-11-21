@@ -25,18 +25,19 @@ module Cleantracker
 
     def parse!(args)
       parser.parse!(args)
+      usage! if @help
       @chart = args.shift
       raise "chart is required" unless @chart
       raise "invalid chart: #{@chart}" unless director.chart_list.include?(@chart)
       raise "username is required" unless @username
-    rescue Exception => e
+    rescue StandardError => e
       usage!(e.message)
     end
 
     def parser
       @parser ||= OptionParser.new do |opts|
         opts.banner = "Usage: cleantracker [options] chart"
-        opts.on("-h", "--help", "Print help") { puts usage! }
+        opts.on("-h", "--help", "Print help") { @help = true }
         opts.on("-u", "--username USERNAME", "Cleancoders Username") { |name| @username = name }
         opts.on("-c", "--cache", "Use cached data if available") { |name| @use_cache = true }
       end
@@ -76,6 +77,8 @@ module Cleantracker
       else
         director.load_clean_data
       end
+    rescue SystemExit
+      #ok
     rescue Exception => e
       puts e
       puts e.backtrace
