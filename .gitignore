@@ -1,3 +1,6 @@
+*.llp
+.DS_Store
+*.iml
 .idea
 gems
 /lib/*.jar

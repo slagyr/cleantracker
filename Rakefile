@@ -25,6 +25,7 @@ namespace :bundle do
 
   desc "Installed a local bundle for production"
   task :standalone do
+		system "rm Gemfile.lock"
     system "bundle install --standalone --path=gems --without=development"
   end
 
